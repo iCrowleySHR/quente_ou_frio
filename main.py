@@ -1,8 +1,8 @@
-from game.jogo import JogoQuenteFrio
+from app.game import HotOrColdGame
 
 def main():
-    jogo = JogoQuenteFrio()
-    jogo.iniciar()
+    jogo = HotOrColdGame()
+    jogo.start()
 
 if __name__ == "__main__":
     main()
