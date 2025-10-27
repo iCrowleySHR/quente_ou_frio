@@ -9,24 +9,35 @@ class HotOrColdGame:
         self.mysterious_number = None
         self.attempts = 0
 
-    def start(self):
-        """Inicia o jogo, pedindo nome e número de dígitos."""
-        name = input("Olá! Qual é o seu nome? ").strip()
-        self.player = Player(name)
+    def ask_player_name(self) -> Player:
+        """Pede o nome do jogador via input, cria o Player e retorna."""
+        while True:
+            name = input("Olá! Qual é o seu nome? ").strip()
+            if name:
+                self.player = Player(name)
+                print(f"👋 Bem-vindo, {self.player.name}!\n")
+                return self.player
+            else:
+                print("Por favor, digite um nome válido.\n")
 
+    def ask_number_of_digits(self) -> int:
+        """Pergunta quantos dígitos terá o número misterioso."""
         while True:
             try:
                 digits = int(input("Quantos dígitos terá o número misterioso? "))
                 if digits <= 0:
-                    print("Digite um número de dígitos válido (maior que zero).")
+                    print("Digite um número de dígitos válido (maior que zero).\n")
                     continue
-                break
+                return digits
             except ValueError:
-                print("Por favor, digite um número inteiro válido.")
+                print("Por favor, digite um número inteiro válido.\n")
 
+    def start(self):
+        """Inicia o jogo."""
+        self.ask_player_name()
+        digits = self.ask_number_of_digits()
         self.mysterious_number = generate_mysterious_number(digits)
-        print("\nO número foi gerado! Tente adivinhar:\n")
-
+        print("🔢 O número foi gerado! Tente adivinhar:\n")
         self.play()
 
     def play(self):
@@ -37,16 +48,16 @@ class HotOrColdGame:
             try:
                 guess = int(input("Chute um número: "))
             except ValueError:
-                print("Por favor, digite um número válido.")
+                print("Por favor, digite um número válido.\n")
                 continue
 
             self.attempts += 1
             self.player.register_guess(self.attempts, guess)
 
             if guess < self.mysterious_number:
-                print("O número jogado é menor que o número misterioso.\n")
+                print("🔥 Está frio... o número é maior!\n")
             elif guess > self.mysterious_number:
-                print("O número jogado é maior que o número misterioso.\n")
+                print("❄️ Está frio... o número é menor!\n")
             else:
                 print(
                     f"🎉 Parabéns, {self.player.name}! "
@@ -69,4 +80,4 @@ class HotOrColdGame:
                 print("👋 Obrigado por jogar! Até a próxima!")
                 break
             else:
-                print("Resposta inválida. Digite 'sim' ou 'não'.")
+                print("Resposta inválida. Digite 'sim' ou 'não'.\n")
