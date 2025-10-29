@@ -24,6 +24,7 @@ class Interface:
         # --- Entrada ---
         self.entry = tk.Entry(self.main_frame, **themes.THEME["entry"])
         self.entry.pack(pady=5)
+        self.entry.focus_set()  # Foco inicial no Entry
 
         # --- Botão ---
         self.button = tk.Button(self.main_frame, text="OK", command=self._on_submit, **themes.THEME["button"])
@@ -66,23 +67,36 @@ class Interface:
 
         # Controle interno
         self._input_value = None
+        self._waiting_for_input = False
 
         self.root.bind("<Return>", lambda event: self._on_submit())
 
     # ---------- Funções de interação ----------
     def _on_submit(self, event=None):
+        """Processa a submissão do usuário."""
+        if not self._waiting_for_input:
+            return
+            
         self._input_value = self.entry.get().strip()
         self.entry.delete(0, tk.END)
-        self.entry.focus_set()
-        self.root.quit()
+        self.entry.focus_set()  # Garante que o foco volte para o Entry
+        self._waiting_for_input = False
+        self.root.quit()  # Sai do loop principal para continuar o processamento
 
     def ask_player_name(self) -> str:
+        """Solicita o nome do jogador."""
         self.label_title.config(text="Qual é o seu nome?")
+        self._waiting_for_input = True
+        self.entry.focus_set()
         self.root.mainloop()
         return self._input_value or "Jogador"
 
     def ask_number_of_digits(self) -> int:
+        """Solicita o número de dígitos."""
         self.label_title.config(text="Quantos dígitos terá o número misterioso?")
+        self._waiting_for_input = True
+        self.entry.focus_set()
+        
         while True:
             self.root.mainloop()
             try:
@@ -91,36 +105,50 @@ class Interface:
                     return digits
                 else:
                     messagebox.showwarning("Aviso", "Digite um número maior que zero.")
+                    self._waiting_for_input = True
+                    self.entry.focus_set()
             except ValueError:
                 messagebox.showwarning("Erro", "Digite um número inteiro válido.")
+                self._waiting_for_input = True
+                self.entry.focus_set()
 
     def ask_guess(self) -> int:
+        """Solicita um palpite do jogador."""
         self.label_title.config(text="Chute um número:")
+        self._waiting_for_input = True
         self.entry.focus_set()
+        
         while True:
             self.root.mainloop()
             try:
                 return int(self._input_value)
             except ValueError:
                 messagebox.showwarning("Erro", "Digite um número válido.")
+                self._waiting_for_input = True
                 self.entry.focus_set()
 
     # ---------- Exibição visual ----------
     def show_feedback(self, text: str, color: str):
         """Mostra mensagem colorida."""
         self.feedback_label.config(text=text, fg=color)
+        self.root.update()  # Atualiza a interface para mostrar o feedback
 
     def add_history(self, attempt: int, guess: int, result: str):
         """Adiciona o palpite à lista."""
         self.history_list.insert(tk.END, f"Tentativa {attempt}: {guess} → {result}")
+        # Rola para o final da lista
+        self.history_list.see(tk.END)
 
     def ask_restart(self) -> bool:
+        """Pergunta se o jogador quer reiniciar."""
         return messagebox.askyesno("Reiniciar", "Quer jogar de novo?")
 
     def clear_history(self):
+        """Limpa o histórico de palpites."""
         self.history_list.delete(0, tk.END)
 
     def close(self):
+        """Fecha a janela."""
         self.root.destroy()
 
     # ---------- Funções do gráfico ----------
