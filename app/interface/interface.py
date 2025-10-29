@@ -70,7 +70,7 @@ class Interface:
         self.root.bind("<Return>", lambda event: self._on_submit())
 
     # ---------- Funções de interação ----------
-    def _on_submit(self):
+    def _on_submit(self, event=None):
         self._input_value = self.entry.get().strip()
         self.entry.delete(0, tk.END)
         self.entry.focus_set()
@@ -96,12 +96,14 @@ class Interface:
 
     def ask_guess(self) -> int:
         self.label_title.config(text="Chute um número:")
+        self.entry.focus_set()
         while True:
             self.root.mainloop()
             try:
                 return int(self._input_value)
             except ValueError:
                 messagebox.showwarning("Erro", "Digite um número válido.")
+                self.entry.focus_set()
 
     # ---------- Exibição visual ----------
     def show_feedback(self, text: str, color: str):
