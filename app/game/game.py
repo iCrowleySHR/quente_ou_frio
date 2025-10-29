@@ -1,6 +1,7 @@
 from .model.player import Player
 from .engine import GameEngine
-from ..interface.interface import Interface  
+from ..interface.interface import Interface
+from ..interface.style import colors
 
 class HotOrColdGame:
     """Orquestração do jogo."""
@@ -16,8 +17,9 @@ class HotOrColdGame:
         self.player = Player(name)
         digits = self.io.ask_number_of_digits()
         self.engine = GameEngine(digits)
+        self.io.clear_history()
 
-        self.io.show_message("🔢 O número foi gerado! Tente adivinhar!")
+        self.io.show_feedback("O número foi gerado! Tente adivinhar!", colors.TEXT)
         self.play()
 
     def play(self):
@@ -29,16 +31,21 @@ class HotOrColdGame:
             result = self.engine.check_guess(guess)
             self.player.register_guess(self.engine.attempts, guess)
 
+            # Adiciona ao histórico
             if result == "low":
-                self.io.show_message("🔥 Está frio... o número é MAIOR!")
+                self.io.show_feedback("Está frio... o número é MAIOR!", colors.INFO)
+                self.io.add_history(self.engine.attempts, guess, "Frio ❄️ (baixo)")
             elif result == "high":
-                self.io.show_message("❄️ Está frio... o número é MENOR!")
+                self.io.show_feedback("Está frio... o número é MENOR!", colors.ERROR)
+                self.io.add_history(self.engine.attempts, guess, "Frio ❄️ (alto)")
             else:
-                self.io.show_message(
-                    f"🎉 Parabéns, {self.player.name}!\n"
+                self.io.show_feedback(
+                    f"🎯 Parabéns, {self.player.name}!\n"
                     f"Você acertou o número {self.engine.mysterious_number} "
-                    f"em {self.engine.attempts} tentativas!"
+                    f"em {self.engine.attempts} tentativas!",
+                    colors.SUCCESS
                 )
+                self.io.add_history(self.engine.attempts, guess, "✅ ACERTOU!")
                 break
 
         self.restart()
@@ -48,5 +55,5 @@ class HotOrColdGame:
         if self.io.ask_restart():
             self.start()
         else:
-            self.io.show_message("👋 Obrigado por jogar! Até a próxima!")
+            self.io.show_feedback("👋 Obrigado por jogar! Até a próxima!", colors.TEXT)
             self.io.root.after(2000, self.io.close)

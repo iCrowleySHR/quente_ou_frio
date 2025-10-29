@@ -1,19 +1,9 @@
 from . import colors, fonts
 
 THEME = {
-    "window": {
-        "bg": colors.BACKGROUND
-    },
-    "label_title": {
-        "bg": colors.BACKGROUND,
-        "fg": colors.TEXT,
-        "font": fonts.TITLE_FONT
-    },
-    "label_text": {
-        "bg": colors.BACKGROUND,
-        "fg": colors.TEXT,
-        "font": fonts.TEXT_FONT
-    },
+    "window": {"bg": colors.BACKGROUND},
+    "label_title": {"bg": colors.BACKGROUND, "fg": colors.TEXT, "font": fonts.TITLE_FONT},
+    "label_text": {"bg": colors.BACKGROUND, "fg": colors.TEXT, "font": fonts.TEXT_FONT},
     "entry": {
         "bg": colors.SECONDARY,
         "fg": colors.TEXT,
@@ -21,7 +11,7 @@ THEME = {
         "font": fonts.TEXT_FONT,
         "relief": "flat",
         "justify": "center",
-        "width": 15
+        "width": 15,
     },
     "button": {
         "bg": colors.ACCENT,
@@ -30,6 +20,6 @@ THEME = {
         "activeforeground": colors.TEXT,
         "font": fonts.BUTTON_FONT,
         "relief": "flat",
-        "width": 12
-    }
+        "width": 12,
+    },
 }
