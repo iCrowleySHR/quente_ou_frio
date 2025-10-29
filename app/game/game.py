@@ -13,8 +13,9 @@ class HotOrColdGame:
 
     def start(self):
         """Inicia o jogo."""
-        name = self.io.ask_player_name()
-        self.player = Player(name)
+        if self.player is None:
+            name = self.io.ask_player_name()
+            self.player = Player(name)
         digits = self.io.ask_number_of_digits()
         self.engine = GameEngine(digits)
         self.io.clear_history()
