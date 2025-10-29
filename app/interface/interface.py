@@ -9,7 +9,7 @@ class Interface:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Quente ou Frio")
-        self.root.geometry("800x700")
+        self.root.attributes('-fullscreen', True)
         self.root.configure(**themes.THEME["window"])
         self.root.resizable(False, False)
 
