@@ -1,4 +1,4 @@
-from app.game import HotOrColdGame
+from app.game.game import HotOrColdGame
 
 def main():
     game = HotOrColdGame()

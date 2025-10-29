@@ -1,6 +1,6 @@
 from .model.player import Player
 from .engine import GameEngine
-from .interface import Interface
+from ..interface.interface import Interface  
 
 class HotOrColdGame:
     """Orquestração do jogo."""
@@ -17,7 +17,7 @@ class HotOrColdGame:
         digits = self.io.ask_number_of_digits()
         self.engine = GameEngine(digits)
 
-        print("🔢 O número foi gerado! Tente adivinhar:\n")
+        self.io.show_message("🔢 O número foi gerado! Tente adivinhar!")
         self.play()
 
     def play(self):
@@ -30,13 +30,15 @@ class HotOrColdGame:
             self.player.register_guess(self.engine.attempts, guess)
 
             if result == "low":
-                print("🔥 Está frio... o número é maior!\n")
+                self.io.show_message("🔥 Está frio... o número é MAIOR!")
             elif result == "high":
-                print("❄️ Está frio... o número é menor!\n")
+                self.io.show_message("❄️ Está frio... o número é MENOR!")
             else:
-                print(f"🎉 Parabéns, {self.player.name}! "
-                      f"Você acertou o número {self.engine.mysterious_number} "
-                      f"em {self.engine.attempts} tentativas.\n")
+                self.io.show_message(
+                    f"🎉 Parabéns, {self.player.name}!\n"
+                    f"Você acertou o número {self.engine.mysterious_number} "
+                    f"em {self.engine.attempts} tentativas!"
+                )
                 break
 
         self.restart()
@@ -44,7 +46,7 @@ class HotOrColdGame:
     def restart(self):
         """Pergunta se o jogador quer reiniciar."""
         if self.io.ask_restart():
-            print("\n🔄 Reiniciando o jogo...\n")
             self.start()
         else:
-            print("👋 Obrigado por jogar! Até a próxima!")
+            self.io.show_message("👋 Obrigado por jogar! Até a próxima!")
+            self.io.root.after(2000, self.io.close)
