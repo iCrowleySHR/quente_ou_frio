@@ -12,12 +12,16 @@ class GameGraph:
         self.correct_number = None
         self.guesses = []
         self.canvas = None
-
+        self.show_correct_number = False  
     def set_correct_number(self, number):
         self.correct_number = number
 
     def add_guess(self, guess):
         self.guesses.append(guess)
+
+    def reveal_correct_number(self):
+        """Mostra o número correto no gráfico"""
+        self.show_correct_number = True
 
     def clear(self):
         if self.canvas:
@@ -25,17 +29,19 @@ class GameGraph:
             self.canvas = None
         self.guesses.clear()
         self.correct_number = None
+        self.show_correct_number = False
 
     def show(self):
-        if self.correct_number is None:
-            raise ValueError("Número correto não definido")
-
         fig, ax = plt.subplots(figsize=(6, 4))
         ax.set_title("Tentativas do jogador vs Número correto")
         ax.set_xlabel("Número")
         ax.set_ylabel("Tentativa")
 
-        ax.axvline(self.correct_number, color='green', linestyle='--', label='Número correto')
+        if self.show_correct_number and self.correct_number is not None:
+            ax.axvline(self.correct_number, color='green', linestyle='--', label='Número correto')
+            legend_needed = True
+        else:
+            legend_needed = False
 
         for i, guess in enumerate(self.guesses, start=1):
             ax.plot(guess, i, 'ro')
@@ -43,7 +49,9 @@ class GameGraph:
 
         ax.set_xlim(0, self.max_number)
         ax.set_ylim(0, len(self.guesses) + 2)
-        ax.legend()
+        
+        if legend_needed:
+            ax.legend()
         ax.grid(True)
 
         self.canvas = FigureCanvasTkAgg(fig, master=self.parent)

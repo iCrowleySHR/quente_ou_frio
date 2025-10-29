@@ -18,6 +18,11 @@ class HotOrColdGame:
         digits = self.io.ask_number_of_digits()
         self.engine = GameEngine(digits)
         self.io.clear_history()
+        self.io.clear_graph()
+
+        # Inicializa o gráfico (sem mostrar o número correto ainda)
+        max_number = 10 ** digits - 1
+        self.io.initialize_graph(max_number, self.engine.mysterious_number)
 
         self.io.show_feedback("O número foi gerado! Tente adivinhar!", colors.TEXT)
         self.play()
@@ -31,6 +36,9 @@ class HotOrColdGame:
             result = self.engine.check_guess(guess)
             self.player.register_guess(self.engine.attempts, guess)
 
+            # Atualiza o gráfico
+            self.io.update_graph(guess)
+
             # Adiciona ao histórico
             if result == "low":
                 self.io.show_feedback("Está frio... o número é MAIOR!", colors.INFO)
@@ -39,6 +47,8 @@ class HotOrColdGame:
                 self.io.show_feedback("Está frio... o número é MENOR!", colors.ERROR)
                 self.io.add_history(self.engine.attempts, guess, "Frio ❄️ (alto)")
             else:
+                # Quando acertar, revela o número correto no gráfico
+                self.io.reveal_correct_number()
                 self.io.show_feedback(
                     f"🎯 Parabéns, {self.player.name}!\n"
                     f"Você acertou o número {self.engine.mysterious_number} "

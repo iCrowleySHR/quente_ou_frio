@@ -1,36 +1,45 @@
 import tkinter as tk
 from tkinter import messagebox
 from .style import colors, themes
+from .graph import GameGraph
 
 class Interface:
-    """Interface gráfica com histórico de palpites e feedback colorido."""
+    """Interface gráfica com histórico de palpites, feedback colorido e gráfico."""
 
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Quente ou Frio")
-        self.root.geometry("700x600")
+        self.root.geometry("800x700")
         self.root.configure(**themes.THEME["window"])
         self.root.resizable(False, False)
 
+        # Frame principal
+        self.main_frame = tk.Frame(self.root, bg=colors.BACKGROUND)
+        self.main_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
         # --- Título ---
-        self.label_title = tk.Label(self.root, text="Bem-vindo ao Quente ou Frio!", **themes.THEME["label_title"])
+        self.label_title = tk.Label(self.main_frame, text="Bem-vindo ao Quente ou Frio!", **themes.THEME["label_title"])
         self.label_title.pack(pady=15)
 
         # --- Entrada ---
-        self.entry = tk.Entry(self.root, **themes.THEME["entry"])
+        self.entry = tk.Entry(self.main_frame, **themes.THEME["entry"])
         self.entry.pack(pady=5)
 
         # --- Botão ---
-        self.button = tk.Button(self.root, text="OK", command=self._on_submit, **themes.THEME["button"])
+        self.button = tk.Button(self.main_frame, text="OK", command=self._on_submit, **themes.THEME["button"])
         self.button.pack(pady=10)
 
         # --- Mensagem de feedback ---
-        self.feedback_label = tk.Label(self.root, text="", **themes.THEME["label_text"])
+        self.feedback_label = tk.Label(self.main_frame, text="", **themes.THEME["label_text"])
         self.feedback_label.pack(pady=10)
 
-        # --- Histórico ---
-        self.history_frame = tk.Frame(self.root, bg=colors.BACKGROUND)
-        self.history_frame.pack(pady=10, fill="both", expand=True)
+        # --- Frame para conteúdo inferior (histórico e gráfico) ---
+        self.bottom_frame = tk.Frame(self.main_frame, bg=colors.BACKGROUND)
+        self.bottom_frame.pack(fill="both", expand=True, pady=10)
+
+        # --- Frame do histórico (esquerda) ---
+        self.history_frame = tk.Frame(self.bottom_frame, bg=colors.BACKGROUND)
+        self.history_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
         self.history_title = tk.Label(self.history_frame, text="📜 Histórico de Palpites:", **themes.THEME["label_text"])
         self.history_title.pack()
@@ -43,7 +52,17 @@ class Interface:
             highlightthickness=0,
             selectbackground=colors.ACCENT,
         )
-        self.history_list.pack(padx=20, pady=10, fill="both", expand=True)
+        self.history_list.pack(padx=10, pady=10, fill="both", expand=True)
+
+        # --- Frame do gráfico (direita) ---
+        self.graph_frame = tk.Frame(self.bottom_frame, bg=colors.BACKGROUND)
+        self.graph_frame.pack(side="right", fill="both", expand=True, padx=(10, 0))
+
+        self.graph_title = tk.Label(self.graph_frame, text="📊 Progresso das Tentativas:", **themes.THEME["label_text"])
+        self.graph_title.pack()
+
+        # Inicializa o gráfico vazio
+        self.game_graph = None
 
         # Controle interno
         self._input_value = None
@@ -54,6 +73,7 @@ class Interface:
     def _on_submit(self):
         self._input_value = self.entry.get().strip()
         self.entry.delete(0, tk.END)
+        self.entry.focus_set()
         self.root.quit()
 
     def ask_player_name(self) -> str:
@@ -100,3 +120,38 @@ class Interface:
 
     def close(self):
         self.root.destroy()
+
+    # ---------- Funções do gráfico ----------
+    def initialize_graph(self, max_number: int, correct_number: int):
+        """Inicializa o gráfico do jogo."""
+        if self.game_graph:
+            self.game_graph.clear()
+        
+        self.game_graph = GameGraph(self.graph_frame, max_number)
+        self.game_graph.set_correct_number(correct_number)
+
+    def update_graph(self, guess: int):
+        """Atualiza o gráfico com um novo palpite."""
+        if self.game_graph:
+            self.game_graph.add_guess(guess)
+            # Limpa o frame do gráfico antes de mostrar o novo
+            for widget in self.graph_frame.winfo_children():
+                if isinstance(widget, tk.Frame) or hasattr(widget, '_name') and 'canvas' in str(widget._name).lower():
+                    widget.destroy()
+            self.game_graph.show()
+
+    def reveal_correct_number(self):
+        """Revela o número correto no gráfico"""
+        if self.game_graph:
+            self.game_graph.reveal_correct_number()
+            # Atualiza o gráfico para mostrar o número correto
+            for widget in self.graph_frame.winfo_children():
+                if isinstance(widget, tk.Frame) or hasattr(widget, '_name') and 'canvas' in str(widget._name).lower():
+                    widget.destroy()
+            self.game_graph.show()
+
+    def clear_graph(self):
+        """Limpa o gráfico."""
+        if self.game_graph:
+            self.game_graph.clear()
+            self.game_graph = None
