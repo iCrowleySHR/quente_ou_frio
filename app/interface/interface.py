@@ -48,6 +48,8 @@ class Interface:
         # Controle interno
         self._input_value = None
 
+        self.root.bind("<Return>", lambda event: self._on_submit())
+
     # ---------- Funções de interação ----------
     def _on_submit(self):
         self._input_value = self.entry.get().strip()
